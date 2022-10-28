@@ -35,7 +35,7 @@ The GHCPU has a total of nine instructions. They are:
 [//]: # (Generated with https://www.tablesgenerator.com/markdown_tables) 
 
 | Code (decimal) | Code (binary)   | Instruction   | Description                                                                      |
-|----------------|-----------------|---------------|----------------------------------------------------------------------------------|
+|---------------:|:---------------:|---------------|----------------------------------------------------------------------------------|
 | 2              | `00000010`      | `LOD <ad>`    | Loads contents in address `<ad>` into ACC                                        |
 | 4              | `00000100`      | `STO <ad>`    | Loads address `<ad>` with contents in ACC                                        |
 | 6              | `00000110`      | `JMP <ad>`    | Unconditional jump: loads IC with address `<ad>`                                 |
