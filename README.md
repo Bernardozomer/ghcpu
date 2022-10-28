@@ -34,14 +34,14 @@ The GHCPU has a total of nine instructions. They are:
 
 [//]: # (Generated with https://www.tablesgenerator.com/markdown_tables) 
 
-| Code (decimal) | Code (binary) | Instruction | Description                                                                    |
-|----------------|---------------|-------------|--------------------------------------------------------------------------------|
-| 2              | 00000010      | LOD <ad>    | Loads contents in address <ad> into ACC                                        |
-| 4              | 00000100      | STO <ad>    | Loads address <ad> with contents in ACC                                        |
-| 6              | 00000110      | JMP <ad>    | Unconditional jump: loads IC with address <ad>                                 |
-| 8              | 00001000      | JMZ <ad>    | Conditional jump: loads IC with address <ad> if ACC is 0                       |
-| 10             | 00001010      | CPE <ad>    | Loads ACC with 0 if contents in <ad> are equal to those in ACC and 1 otherwise |
-| 14             | 00001110      | ADD <ad>    | Loads ACC with the sum of its contents with the contents in <ad>               |
-| 16             | 00010000      | SUB <ad>    | Loads ACC with the subtraction of its contents with the contents in <ad>       |
-| 18             | 00010010      | NOP         | Does not execute any operation                                                 |
-| 20             | 00010100      | HLT         | Halts the execution cycle                                                      |
+| Code (decimal) | Code (binary)   | Instruction   | Description                                                                      |
+|----------------|-----------------|---------------|----------------------------------------------------------------------------------|
+| 2              | `00000010`      | `LOD <ad>`    | Loads contents in address `<ad>` into ACC                                        |
+| 4              | `00000100`      | `STO <ad>`    | Loads address `<ad>` with contents in ACC                                        |
+| 6              | `00000110`      | `JMP <ad>`    | Unconditional jump: loads IC with address `<ad>`                                 |
+| 8              | `00001000`      | `JMZ <ad>`    | Conditional jump: loads IC with address `<ad>` if ACC is 0                       |
+| 10             | `00001010`      | `CPE <ad>`    | Loads ACC with 0 if contents in `<ad>` are equal to those in ACC and 1 otherwise |
+| 14             | `00001110`      | `ADD <ad>`    | Loads ACC with the sum of its contents with the contents in `<ad>`               |
+| 16             | `00010000`      | `SUB <ad>`    | Loads ACC with the subtraction of its contents with the contents in `<ad>`       |
+| 18             | `00010010`      | `NOP`         | Does not execute any operation                                                   |
+| 20             | `00010100`      | `HLT`         | Halts the execution cycle                                                        |
