@@ -18,9 +18,9 @@ The GHCPU has a total of seven registers. They are:
 
 - **ACC:** Accumulator (8-bit). The ALU is able to add or subtract contents of 
 a memory location with the contents of the accumulator, storing the result 
-in the accumulator itself.
+in the accumulator itself;
 - **EQZ:** Equals Zero (1-bit). Indicates when the accumulator is equal to 0;
-- **IC:** Instruction Counter (8-bit). 
+- **IC:** Instruction Counter (8-bit);
 - **IR:** Instruction Register (16-bit). Holds the value of 
 the next instruction to be executed;
 - **MAR:** Memory Address Register (8-bit); 
