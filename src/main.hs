@@ -18,14 +18,17 @@ newtype Val = Val Word8 deriving (Show)
 data Reg = Reg {
 	regACC :: Val,
 	regEQZ :: Bool,
-	regIC :: Ptr,
-	regIR :: (Word8, Word8),
+	regIC  :: Ptr,
+	regIR  :: (Word8, Word8),
 	regMAR :: Ptr,
 	regMDR :: Ptr,
-	regPC :: Ptr
+	regPC  :: Ptr
 } deriving (Show)
 
 data RAM = RAM [Val] deriving (Show)
+
+newtype Ptr = Ptr Word8 deriving (Show)
+newtype Val = Val Word8 deriving (Show)
 
 -- Parse an instruction encoded in two Word8's.
 parseInstr :: (Word8, Word8) -> Instr
