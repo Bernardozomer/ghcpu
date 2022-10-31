@@ -10,3 +10,12 @@ data Instr ad =
 	| HLT
 	deriving (Eq, Show)
 
+data Reg =
+	  ACC
+	| EQZ
+	| IC
+	| IR
+	| MAR
+	| MDR
+	| PC
+	deriving (Show)
