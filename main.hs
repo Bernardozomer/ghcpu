@@ -1,14 +1,19 @@
-data Instr ad =
-	  LOD ad
-	| STO ad
-	| JMP ad
-	| JMZ ad
-	| CPE ad
-	| ADD ad
-	| SUB ad
+import Data.Word
+
+data Instr =
+	  LOD Ptr
+	| STO Ptr
+	| JMP Ptr
+	| JMZ Ptr
+	| CPE Ptr
+	| ADD Ptr
+	| SUB Ptr
 	| NOP
 	| HLT
-	deriving (Eq, Show)
+	deriving (Show)
+
+newtype Ptr = Ptr Word8 deriving (Show)
+newtype Val = Val Word8 deriving (Show)
 
 data Reg =
 	  ACC
