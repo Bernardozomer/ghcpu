@@ -1,15 +1,15 @@
 import Data.Word
 
 data Instr =
-	  LOD Ptr
-	| STO Ptr
-	| JMP Ptr
-	| JMZ Ptr
-	| CPE Ptr
-	| ADD Ptr
-	| SUB Ptr
-	| NOP
-	| HLT
+	  Lod Ptr
+	| Sto Ptr
+	| Jmp Ptr
+	| Jmz Ptr
+	| Cpe Ptr
+	| Add Ptr
+	| Sub Ptr
+	| Nop
+	| Hlt
 	deriving (Show)
 
 newtype Ptr = Ptr Word8 deriving (Show)
