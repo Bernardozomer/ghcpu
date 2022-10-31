@@ -25,6 +25,8 @@ data Reg = Reg {
 	regPC :: Ptr
 } deriving (Show)
 
+data RAM = RAM [Val] deriving (Show)
+
 -- Parse an instruction encoded in two Word8's.
 parseInstr :: (Word8, Word8) -> Instr
 parseInstr  (2, y) = Lod (Ptr y)
