@@ -12,8 +12,13 @@ data Instr =
 	| Hlt
 	deriving (Show)
 
-newtype Ptr = Ptr Word8 deriving (Show)
-newtype Val = Val Word8 deriving (Show)
+data CPUState = CPUState Op Reg
+
+data Op =
+	  LoadInstr
+	| ExeInstr Instr
+	| ReadMem Ptr
+	| WriteMem Ptr
 
 data Reg = Reg {
 	regACC :: Val,
