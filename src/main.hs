@@ -30,6 +30,9 @@ data Regs = Regs {
 	regPC  :: Ptr
 } deriving (Show)
 
+data Reg = RegACC | RegEQZ | RegIC | RegIR | RegMAR | RegMDR | RegPC
+	deriving (Show)
+
 data RAM = RAM [Val] deriving (Show)
 
 newtype Ptr = Ptr Word8 deriving (Show)
