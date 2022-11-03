@@ -12,7 +12,7 @@ data Instr =
 	| Hlt
 	deriving (Show)
 
-data CPUState = CPUState Op Reg
+data CPUState = CPUState Op Regs
 
 data Op =
 	  LoadInstr
@@ -20,7 +20,7 @@ data Op =
 	| ReadMem Ptr
 	| WriteMem Ptr
 
-data Reg = Reg {
+data Regs = Regs {
 	regACC :: Val,
 	regEQZ :: Bool,
 	regIC  :: Ptr,
