@@ -49,3 +49,35 @@ parseInstr (14, y) = Add (Ptr y)
 parseInstr (16, y) = Sub (Ptr y)
 parseInstr (18, y) = Nop
 parseInstr (20, y) = Hlt
+
+readRegPtr :: Reg -> Regs -> Ptr
+readRegPtr reg (Regs _ _ regIC _ regMAR regMDR regPC) = case reg of
+	RegIC  -> regIC
+	RegMAR -> regMAR
+	RegMDR -> regMDR
+	RegPC  -> regPC
+
+readRegACC :: Regs -> Val
+readRegACC (Regs regACC _ _ _ _ _ _) = regACC
+
+readRegEQZ :: Regs -> Bool
+readRegEQZ (Regs _ regEQZ _ _ _ _ _) = regEQZ
+
+readRegIR :: Regs -> (Val, Ptr)
+readRegIR (Regs _ _ _ regIR _ _ _) = regIR
+
+writeRegPtr :: Ptr -> Reg -> Regs -> Regs
+writeRegPtr ptr reg regs = case reg of
+	RegIC  -> regs { regIC  = ptr }
+	RegMAR -> regs { regMAR = ptr }
+	RegMDR -> regs { regMDR = ptr }
+	RegPC  -> regs { regPC  = ptr }
+
+writeRegACC :: Val -> Regs -> Regs
+writeRegACC val regs = regs { regACC = val }
+
+writeRegEQZ :: Bool -> Regs -> Regs
+writeRegEQZ bool regs = regs { regEQZ = bool }
+
+writeRegIR :: (Val, Ptr) -> Regs -> Regs
+writeRegIR (val, ptr) regs = regs { regIR = (val, ptr) }
