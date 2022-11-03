@@ -24,7 +24,7 @@ data Reg = Reg {
 	regACC :: Val,
 	regEQZ :: Bool,
 	regIC  :: Ptr,
-	regIR  :: (Word8, Word8),
+	regIR  :: (Val, Ptr),
 	regMAR :: Ptr,
 	regMDR :: Ptr,
 	regPC  :: Ptr
