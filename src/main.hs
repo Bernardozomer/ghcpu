@@ -66,22 +66,6 @@ readRegEQZ (Regs _ regEQZ _ _ _ _ _) = regEQZ
 readRegIR :: Regs -> (Val, Ptr)
 readRegIR (Regs _ _ _ regIR _ _ _) = regIR
 
-writeRegPtr :: Ptr -> Reg -> Regs -> Regs
-writeRegPtr ptr reg regs = case reg of
-	RegIC  -> regs { regIC  = ptr }
-	RegMAR -> regs { regMAR = ptr }
-	RegMDR -> regs { regMDR = ptr }
-	RegPC  -> regs { regPC  = ptr }
-
-writeRegACC :: Val -> Regs -> Regs
-writeRegACC val regs = regs { regACC = val }
-
-writeRegEQZ :: Bool -> Regs -> Regs
-writeRegEQZ bool regs = regs { regEQZ = bool }
-
-writeRegIR :: (Val, Ptr) -> Regs -> Regs
-writeRegIR (val, ptr) regs = regs { regIR = (val, ptr) }
-
 cycle :: (CPUState, RAM) ->  (CPUState, RAM)
 cycle (CPUState op regs, RAM ram) = case op of
 	ExeInstr instr -> case instr of
