@@ -81,3 +81,21 @@ writeRegEQZ bool regs = regs { regEQZ = bool }
 
 writeRegIR :: (Val, Ptr) -> Regs -> Regs
 writeRegIR (val, ptr) regs = regs { regIR = (val, ptr) }
+
+cycle :: (CPUState, RAM) ->  (CPUState, RAM)
+cycle (CPUState op regs, RAM ram) = case op of
+	ReadMem (Ptr ptr) -> (
+			CPUState LoadInstr regs { regACC = ram !! (fromIntegral ptr) },
+			RAM ram
+		)
+	WriteMem (Ptr ptr) -> (
+			CPUState LoadInstr regs,
+			RAM (setAt (fromIntegral ptr) (readRegACC regs) ram)
+		)
+
+-- Source: https://stackoverflow.com/a/5852820/7834359
+setAt :: Int -> a -> [a] -> [a]
+setAt _ _ [] = []
+setAt n newVal (x:xs)
+	| n == 0 = newVal:xs
+	| otherwise = x:setAt (n-1) newVal xs
