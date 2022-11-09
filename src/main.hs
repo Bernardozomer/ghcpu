@@ -84,6 +84,8 @@ writeRegIR (val, ptr) regs = regs { regIR = (val, ptr) }
 
 cycle :: (CPUState, RAM) ->  (CPUState, RAM)
 cycle (CPUState op regs, RAM ram) = case op of
+	ExeInstr instr -> case instr of
+		Nop -> (CPUState op regs, RAM ram)
 	ReadMem (Ptr ptr) -> (
 			CPUState LoadInstr regs { regACC = ram !! (fromIntegral ptr) },
 			RAM ram
