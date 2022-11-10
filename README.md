@@ -8,31 +8,30 @@ Great Haskell CPU: A simplified computer architecture simulated with Haskell
 
 ### Memory
 
-The GHCPU has a 256 B, byte-addressable, zero-indexed address space. 
-Bytes 251 to 255 correspond to video memory. Any 8 bit integer stored inside it 
+The GHCPU has a 256 B, byte-addressable, zero-indexed address space.
+Bytes 251 to 255 correspond to video memory. Any 8 bit integer stored inside it
 will be displayed in decimal on the screen.
 
 ### Registers
 
 The GHCPU has a total of seven registers. They are:
 
-- **ACC:** Accumulator (8-bit). The ALU is able to add or subtract contents of 
-a memory location with the contents of the accumulator, storing the result 
+- **ACC:** Accumulator (8-bit). The ALU is able to add or subtract contents of
+a memory location with the contents of the accumulator, storing the result
 in the accumulator itself;
 - **EQZ:** Equals Zero (1-bit). Indicates when the accumulator is equal to 0;
-- **IC:** Instruction Counter (8-bit);
-- **IR:** Instruction Register (16-bit). Holds the value of 
+- **IC:** Instruction Counter (8-bit). Points to the next instruction to be
+executed. Always starts at address 0;
+- **IR:** Instruction Register (16-bit). Holds the value of
 the next instruction to be executed;
-- **MAR:** Memory Address Register (8-bit); 
+- **MAR:** Memory Address Register (8-bit);
 - **MDR:** Memory Data Register (8-bit);
-- **PC:** Program Counter. Points to the next instruction to be executed. 
-Always begins at address 0;
 
 ### Instructions
 
 The GHCPU has a total of nine instructions. They are:
 
-[//]: # (Generated with https://www.tablesgenerator.com/markdown_tables) 
+[//]: # (Generated with https://www.tablesgenerator.com/markdown_tables)
 
 | Code (decimal) | Code (binary)   | Instruction   | Description                                                                      |
 |---------------:|:---------------:|---------------|----------------------------------------------------------------------------------|
