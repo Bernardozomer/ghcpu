@@ -5,8 +5,14 @@ exeStage :: (CPUState, RAM) ->  (CPUState, RAM)
 exeStage (CPUState stage regs, RAM ram) = case stage of
 	Decode -> (CPUState (Execute (decodeInstr (readRegIR regs))) regs, RAM ram)
 	Execute instr -> case instr of
-		Lod ptr -> (CPUState (ReadMem ptr) regs, RAM ram)
-		Sto ptr -> (CPUState (WriteMem ptr) regs, RAM ram)
+		Lod ptr -> (
+				CPUState Fetch regs { regACC = readMem ptr (RAM ram) },
+				RAM ram
+			)
+		Sto ptr -> (
+				CPUState Fetch regs,
+				writeToMem ptr (readRegACC regs) (RAM ram)
+			)
 		Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, RAM ram)
 		Jmz ptr -> if readRegEQZ regs
 			then (CPUState Fetch regs { regIC = ptr }, RAM ram)
@@ -15,14 +21,6 @@ exeStage (CPUState stage regs, RAM ram) = case stage of
 			then (CPUState Fetch regs { regACC = Val 0 }, RAM ram)
 			else (CPUState Fetch regs { regACC = Val 1 }, RAM ram)
 		Nop -> (CPUState stage regs, RAM ram)
-	ReadMem ptr -> (
-			CPUState Fetch regs { regACC = readMem ptr (RAM ram) },
-			RAM ram
-		)
-	WriteMem (Ptr ptr) -> (
-			CPUState Fetch regs,
-			RAM (setAt (fromIntegral ptr) (readRegACC regs) ram)
-		)
 
 -- Decode a 16-bit instruction code.
 decodeInstr :: (Val, Ptr) -> Instr
@@ -82,8 +80,6 @@ data Stage =
 	  Fetch
 	| Decode
 	| Execute Instr
-	| ReadMem Ptr
-	| WriteMem Ptr
 
 data Regs = Regs {
 	regACC :: Val,
