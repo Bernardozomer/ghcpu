@@ -16,6 +16,7 @@ data CPUState = CPUState Stage Regs
 
 data Stage =
 	  Fetch
+	| Decode
 	| Execute Instr
 	| ReadMem Ptr
 	| WriteMem Ptr
