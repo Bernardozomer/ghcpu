@@ -88,5 +88,5 @@ data Regs = Regs {
 data Reg = RegACC | RegEQZ | RegIC | RegIR | RegMAR | RegMDR deriving (Show)
 data RAM = RAM [Val] deriving (Show)
 
-newtype Ptr = Ptr Word8 deriving (Show)
-newtype Val = Val Word8 deriving (Show)
+newtype Ptr = Ptr Word8 deriving (Eq, Show)
+newtype Val = Val Word8 deriving (Eq, Show)
