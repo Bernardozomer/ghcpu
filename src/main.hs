@@ -11,6 +11,9 @@ exeStage (CPUState stage regs, RAM ram) = case stage of
 		Jmz ptr -> if readRegEQZ regs == True
 			then (CPUState Fetch regs { regIC = ptr }, RAM ram)
 			else (CPUState Fetch regs, RAM ram)
+		Cpe (Ptr ptr) -> if ram !! (fromIntegral ptr) == readRegACC regs
+			then (CPUState Fetch regs { regACC = Val 0 }, RAM ram)
+			else (CPUState Fetch regs { regACC = Val 1 }, RAM ram)
 		Nop -> (CPUState stage regs, RAM ram)
 	ReadMem (Ptr ptr) -> (
 			CPUState Fetch regs { regACC = ram !! (fromIntegral ptr) },
