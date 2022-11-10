@@ -11,12 +11,12 @@ exeStage (CPUState stage regs, RAM ram) = case stage of
 		Jmz ptr -> if readRegEQZ regs
 			then (CPUState Fetch regs { regIC = ptr }, RAM ram)
 			else (CPUState Fetch regs, RAM ram)
-		Cpe (Ptr ptr) -> if ram !! (fromIntegral ptr) == readRegACC regs
+		Cpe ptr -> if readMem ptr (RAM ram) == readRegACC regs
 			then (CPUState Fetch regs { regACC = Val 0 }, RAM ram)
 			else (CPUState Fetch regs { regACC = Val 1 }, RAM ram)
 		Nop -> (CPUState stage regs, RAM ram)
-	ReadMem (Ptr ptr) -> (
-			CPUState Fetch regs { regACC = ram !! (fromIntegral ptr) },
+	ReadMem ptr -> (
+			CPUState Fetch regs { regACC = readMem ptr (RAM ram) },
 			RAM ram
 		)
 	WriteMem (Ptr ptr) -> (
@@ -50,6 +50,9 @@ readRegEQZ (Regs _ regEQZ _ _ _ _) = regEQZ
 
 readRegIR :: Regs -> (Val, Ptr)
 readRegIR (Regs _ _ _ regIR _ _) = regIR
+
+readMem :: Ptr -> RAM -> Val
+readMem (Ptr ptr) (RAM ram) = ram !! (fromIntegral ptr)
 
 -- Source: https://stackoverflow.com/a/5852820/7834359
 setAt :: Int -> a -> [a] -> [a]
