@@ -36,17 +36,17 @@ data RAM = RAM [Val] deriving (Show)
 newtype Ptr = Ptr Word8 deriving (Show)
 newtype Val = Val Word8 deriving (Show)
 
--- Parse an instruction encoded in two Word8's.
-parseInstr :: (Word8, Word8) -> Instr
-parseInstr  (2, y) = Lod (Ptr y)
-parseInstr  (4, y) = Sto (Ptr y)
-parseInstr  (6, y) = Jmp (Ptr y)
-parseInstr  (8, y) = Jmz (Ptr y)
-parseInstr (10, y) = Cpe (Ptr y)
-parseInstr (14, y) = Add (Ptr y)
-parseInstr (16, y) = Sub (Ptr y)
-parseInstr (18, y) = Nop
-parseInstr (20, y) = Hlt
+-- Decode a 16-bit instruction code.
+decodeInstr :: (Val, Ptr) -> Instr
+decodeInstr  (Val 2, y) = Lod y
+decodeInstr  (Val 4, y) = Sto y
+decodeInstr  (Val 6, y) = Jmp y
+decodeInstr  (Val 8, y) = Jmz y
+decodeInstr (Val 10, y) = Cpe y
+decodeInstr (Val 14, y) = Add y
+decodeInstr (Val 16, y) = Sub y
+decodeInstr (Val 18, y) = Nop
+decodeInstr (Val 20, y) = Hlt
 
 readRegPtr :: Reg -> Regs -> Ptr
 readRegPtr reg (Regs _ _ regIC _ regMAR regMDR) = case reg of
@@ -65,6 +65,7 @@ readRegIR (Regs _ _ _ regIR _ _) = regIR
 
 exeStage :: (CPUState, RAM) ->  (CPUState, RAM)
 exeStage (CPUState stage regs, RAM ram) = case stage of
+	Decode -> (CPUState (Execute (decodeInstr (readRegIR regs))) regs, RAM ram)
 	Execute instr -> case instr of
 		Lod ptr -> (CPUState (ReadMem ptr) regs, RAM ram)
 		Sto ptr -> (CPUState (WriteMem ptr) regs, RAM ram)
