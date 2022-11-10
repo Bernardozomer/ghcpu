@@ -12,11 +12,11 @@ data Instr =
 	| Hlt
 	deriving (Show)
 
-data CPUState = CPUState Op Regs
+data CPUState = CPUState Stage Regs
 
-data Op =
-	  LoadInstr
-	| ExeInstr Instr
+data Stage =
+	  Fetch
+	| Execute Instr
 	| ReadMem Ptr
 	| WriteMem Ptr
 
@@ -62,22 +62,22 @@ readRegEQZ (Regs _ regEQZ _ _ _ _) = regEQZ
 readRegIR :: Regs -> (Val, Ptr)
 readRegIR (Regs _ _ _ regIR _ _) = regIR
 
-cycle :: (CPUState, RAM) ->  (CPUState, RAM)
-cycle (CPUState op regs, RAM ram) = case op of
-	ExeInstr instr -> case instr of
+exeStage :: (CPUState, RAM) ->  (CPUState, RAM)
+exeStage (CPUState stage regs, RAM ram) = case stage of
+	Execute instr -> case instr of
 		Lod ptr -> (CPUState (ReadMem ptr) regs, RAM ram)
 		Sto ptr -> (CPUState (WriteMem ptr) regs, RAM ram)
-		Jmp ptr -> (CPUState LoadInstr regs { regIC = ptr }, RAM ram)
+		Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, RAM ram)
 		Jmz ptr -> case readRegACC regs of
-			Val 0     -> (CPUState LoadInstr regs { regIC = ptr }, RAM ram)
-			otherwise -> (CPUState LoadInstr regs, RAM ram)
-		Nop -> (CPUState op regs, RAM ram)
+			Val 0     -> (CPUState Fetch regs { regIC = ptr }, RAM ram)
+			otherwise -> (CPUState Fetch regs, RAM ram)
+		Nop -> (CPUState stage regs, RAM ram)
 	ReadMem (Ptr ptr) -> (
-			CPUState LoadInstr regs { regACC = ram !! (fromIntegral ptr) },
+			CPUState Fetch regs { regACC = ram !! (fromIntegral ptr) },
 			RAM ram
 		)
 	WriteMem (Ptr ptr) -> (
-			CPUState LoadInstr regs,
+			CPUState Fetch regs,
 			RAM (setAt (fromIntegral ptr) (readRegACC regs) ram)
 		)
 
