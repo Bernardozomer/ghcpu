@@ -18,8 +18,16 @@ exeStage (CPUState stage regs, RAM ram) = case stage of
 			then (CPUState Fetch regs { regIC = ptr }, RAM ram)
 			else (CPUState Fetch regs, RAM ram)
 		Cpe ptr -> if readMem ptr (RAM ram) == readRegACC regs
-			then (CPUState Fetch regs { regACC = Val 0 }, RAM ram)
-			else (CPUState Fetch regs { regACC = Val 1 }, RAM ram)
+			then (CPUState Fetch regs { regACC = Val 0 } { regEQZ = True }, RAM ram)
+			else (CPUState Fetch regs { regACC = Val 1 } { regEQZ = False }, RAM ram)
+		Add ptr -> (
+				CPUState Fetch regs { regACC = (readRegACC regs + readMem ptr (RAM ram)) },
+				RAM ram
+			)
+		Sub ptr -> (
+				CPUState Fetch regs { regACC = (readRegACC regs - readMem ptr (RAM ram)) },
+				RAM ram
+			)
 		Nop -> (CPUState stage regs, RAM ram)
 
 -- Decode a 16-bit instruction code.
@@ -95,3 +103,6 @@ data RAM = RAM [Val] deriving (Show)
 
 newtype Ptr = Ptr Word8 deriving (Eq, Show)
 newtype Val = Val Word8 deriving (Eq, Show)
+instance Num Val where
+	Val a + Val b = Val (a + b)
+	Val a - Val b = Val (a - b)
