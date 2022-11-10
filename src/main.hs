@@ -54,6 +54,9 @@ readRegIR (Regs _ _ _ regIR _ _) = regIR
 readMem :: Ptr -> RAM -> Val
 readMem (Ptr ptr) (RAM ram) = ram !! (fromIntegral ptr)
 
+writeToMem :: Ptr -> Val -> RAM -> RAM
+writeToMem (Ptr ptr) val (RAM ram) = RAM (setAt (fromIntegral ptr) val ram)
+
 -- Source: https://stackoverflow.com/a/5852820/7834359
 setAt :: Int -> a -> [a] -> [a]
 setAt _ _ [] = []
