@@ -26,7 +26,7 @@ data Regs = Regs {
 	regIC  :: Ptr,
 	regIR  :: (Val, Ptr),
 	regMAR :: Ptr,
-	regMDR :: Ptr,
+	regMDR :: Ptr
 } deriving (Show)
 
 data Reg = RegACC | RegEQZ | RegIC | RegIR | RegMAR | RegMDR deriving (Show)
@@ -54,13 +54,13 @@ readRegPtr reg (Regs _ _ regIC _ regMAR regMDR) = case reg of
 	RegMDR -> regMDR
 
 readRegACC :: Regs -> Val
-readRegACC (Regs regACC _ _ _ _ _ _) = regACC
+readRegACC (Regs regACC _ _ _ _ _) = regACC
 
 readRegEQZ :: Regs -> Bool
-readRegEQZ (Regs _ regEQZ _ _ _ _ _) = regEQZ
+readRegEQZ (Regs _ regEQZ _ _ _ _) = regEQZ
 
 readRegIR :: Regs -> (Val, Ptr)
-readRegIR (Regs _ _ _ regIR _ _ _) = regIR
+readRegIR (Regs _ _ _ regIR _ _) = regIR
 
 cycle :: (CPUState, RAM) ->  (CPUState, RAM)
 cycle (CPUState op regs, RAM ram) = case op of
