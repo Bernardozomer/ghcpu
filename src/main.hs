@@ -33,6 +33,7 @@ exeStage (CPUState stage regs, RAM ram) = case stage of
 				RAM ram
 			)
 		Nop -> (CPUState stage regs, RAM ram)
+		Hlt -> (Halted, RAM ram)
 
 -- Decode a 16-bit instruction code.
 decodeInstr :: (Val, Ptr) -> Instr
@@ -91,7 +92,7 @@ data Instr =
 	| Hlt
 	deriving (Show)
 
-data CPUState = CPUState Stage Regs
+data CPUState = CPUState Stage Regs | Halted
 
 data Stage =
 	  Fetch
