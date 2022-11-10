@@ -16,16 +16,14 @@ will be displayed in decimal on the screen.
 
 The GHCPU has a total of seven registers. They are:
 
-- **ACC:** Accumulator (8-bit). The ALU is able to add or subtract contents of
-a memory location with the contents of the accumulator, storing the result
-in the accumulator itself;
-- **EQZ:** Equals Zero (1-bit). Indicates when the accumulator is equal to 0;
-- **IC:** Instruction Counter (8-bit). Points to the next instruction to be
-executed. Always starts at address 0;
-- **IR:** Instruction Register (16-bit). Holds the value of
-the next instruction to be executed;
-- **MAR:** Memory Address Register (8-bit);
-- **MDR:** Memory Data Register (8-bit);
+| **Register** | **Name**                | **Size (bits)** | **Description**                                                                                                                                     |
+|-------------:|-------------------------|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+|          ACC | Accumulator             |        8        | The ALU is able to add or subtract contents of a memory location with the contents of the accumulator, storing the result in the accumulator itself |
+|          EQZ | Equals Zero             |        1        | Indicates when the accumulator is equal to 0                                                                                                        |
+|           IC | Instruction Counter     |        8        | Points to the next instruction to be executed. Always begins at address 0                                                                           |
+|           IR | Instruction Register    |        16       | Holds the value of the next instruction to be executed                                                                                              |
+|          MAR | Memory Address Register |        8        |                                                                                                                                                     |
+|          MDR | Memory Data Register    |        8        |                                                                                                                                                     |
 
 ### Instructions
 
