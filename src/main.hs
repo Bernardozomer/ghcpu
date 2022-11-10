@@ -70,9 +70,9 @@ exeStage (CPUState stage regs, RAM ram) = case stage of
 		Lod ptr -> (CPUState (ReadMem ptr) regs, RAM ram)
 		Sto ptr -> (CPUState (WriteMem ptr) regs, RAM ram)
 		Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, RAM ram)
-		Jmz ptr -> case readRegACC regs of
-			Val 0     -> (CPUState Fetch regs { regIC = ptr }, RAM ram)
-			otherwise -> (CPUState Fetch regs, RAM ram)
+		Jmz ptr -> if readRegEQZ regs == True
+			then (CPUState Fetch regs { regIC = ptr }, RAM ram)
+			else (CPUState Fetch regs, RAM ram)
 		Nop -> (CPUState stage regs, RAM ram)
 	ReadMem (Ptr ptr) -> (
 			CPUState Fetch regs { regACC = ram !! (fromIntegral ptr) },
