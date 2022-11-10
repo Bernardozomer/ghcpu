@@ -27,12 +27,9 @@ data Regs = Regs {
 	regIR  :: (Val, Ptr),
 	regMAR :: Ptr,
 	regMDR :: Ptr,
-	regPC  :: Ptr
 } deriving (Show)
 
-data Reg = RegACC | RegEQZ | RegIC | RegIR | RegMAR | RegMDR | RegPC
-	deriving (Show)
-
+data Reg = RegACC | RegEQZ | RegIC | RegIR | RegMAR | RegMDR deriving (Show)
 data RAM = RAM [Val] deriving (Show)
 
 newtype Ptr = Ptr Word8 deriving (Show)
@@ -51,11 +48,10 @@ parseInstr (18, y) = Nop
 parseInstr (20, y) = Hlt
 
 readRegPtr :: Reg -> Regs -> Ptr
-readRegPtr reg (Regs _ _ regIC _ regMAR regMDR regPC) = case reg of
+readRegPtr reg (Regs _ _ regIC _ regMAR regMDR) = case reg of
 	RegIC  -> regIC
 	RegMAR -> regMAR
 	RegMDR -> regMDR
-	RegPC  -> regPC
 
 readRegACC :: Regs -> Val
 readRegACC (Regs regACC _ _ _ _ _ _) = regACC
