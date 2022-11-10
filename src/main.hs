@@ -1,5 +1,59 @@
 import Data.Word
 
+exeStage :: (CPUState, RAM) ->  (CPUState, RAM)
+exeStage (CPUState stage regs, RAM ram) = case stage of
+	Decode -> (CPUState (Execute (decodeInstr (readRegIR regs))) regs, RAM ram)
+	Execute instr -> case instr of
+		Lod ptr -> (CPUState (ReadMem ptr) regs, RAM ram)
+		Sto ptr -> (CPUState (WriteMem ptr) regs, RAM ram)
+		Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, RAM ram)
+		Jmz ptr -> if readRegEQZ regs == True
+			then (CPUState Fetch regs { regIC = ptr }, RAM ram)
+			else (CPUState Fetch regs, RAM ram)
+		Nop -> (CPUState stage regs, RAM ram)
+	ReadMem (Ptr ptr) -> (
+			CPUState Fetch regs { regACC = ram !! (fromIntegral ptr) },
+			RAM ram
+		)
+	WriteMem (Ptr ptr) -> (
+			CPUState Fetch regs,
+			RAM (setAt (fromIntegral ptr) (readRegACC regs) ram)
+		)
+
+-- Decode a 16-bit instruction code.
+decodeInstr :: (Val, Ptr) -> Instr
+decodeInstr  (Val 2, y) = Lod y
+decodeInstr  (Val 4, y) = Sto y
+decodeInstr  (Val 6, y) = Jmp y
+decodeInstr  (Val 8, y) = Jmz y
+decodeInstr (Val 10, y) = Cpe y
+decodeInstr (Val 14, y) = Add y
+decodeInstr (Val 16, y) = Sub y
+decodeInstr (Val 18, y) = Nop
+decodeInstr (Val 20, y) = Hlt
+
+readRegPtr :: Reg -> Regs -> Ptr
+readRegPtr reg (Regs _ _ regIC _ regMAR regMDR) = case reg of
+	RegIC  -> regIC
+	RegMAR -> regMAR
+	RegMDR -> regMDR
+
+readRegACC :: Regs -> Val
+readRegACC (Regs regACC _ _ _ _ _) = regACC
+
+readRegEQZ :: Regs -> Bool
+readRegEQZ (Regs _ regEQZ _ _ _ _) = regEQZ
+
+readRegIR :: Regs -> (Val, Ptr)
+readRegIR (Regs _ _ _ regIR _ _) = regIR
+
+-- Source: https://stackoverflow.com/a/5852820/7834359
+setAt :: Int -> a -> [a] -> [a]
+setAt _ _ [] = []
+setAt n newVal (x:xs)
+	| n == 0 = newVal:xs
+	| otherwise = x:setAt (n-1) newVal xs
+
 data Instr =
 	  Lod Ptr
 	| Sto Ptr
@@ -35,57 +89,3 @@ data RAM = RAM [Val] deriving (Show)
 
 newtype Ptr = Ptr Word8 deriving (Show)
 newtype Val = Val Word8 deriving (Show)
-
--- Decode a 16-bit instruction code.
-decodeInstr :: (Val, Ptr) -> Instr
-decodeInstr  (Val 2, y) = Lod y
-decodeInstr  (Val 4, y) = Sto y
-decodeInstr  (Val 6, y) = Jmp y
-decodeInstr  (Val 8, y) = Jmz y
-decodeInstr (Val 10, y) = Cpe y
-decodeInstr (Val 14, y) = Add y
-decodeInstr (Val 16, y) = Sub y
-decodeInstr (Val 18, y) = Nop
-decodeInstr (Val 20, y) = Hlt
-
-readRegPtr :: Reg -> Regs -> Ptr
-readRegPtr reg (Regs _ _ regIC _ regMAR regMDR) = case reg of
-	RegIC  -> regIC
-	RegMAR -> regMAR
-	RegMDR -> regMDR
-
-readRegACC :: Regs -> Val
-readRegACC (Regs regACC _ _ _ _ _) = regACC
-
-readRegEQZ :: Regs -> Bool
-readRegEQZ (Regs _ regEQZ _ _ _ _) = regEQZ
-
-readRegIR :: Regs -> (Val, Ptr)
-readRegIR (Regs _ _ _ regIR _ _) = regIR
-
-exeStage :: (CPUState, RAM) ->  (CPUState, RAM)
-exeStage (CPUState stage regs, RAM ram) = case stage of
-	Decode -> (CPUState (Execute (decodeInstr (readRegIR regs))) regs, RAM ram)
-	Execute instr -> case instr of
-		Lod ptr -> (CPUState (ReadMem ptr) regs, RAM ram)
-		Sto ptr -> (CPUState (WriteMem ptr) regs, RAM ram)
-		Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, RAM ram)
-		Jmz ptr -> if readRegEQZ regs == True
-			then (CPUState Fetch regs { regIC = ptr }, RAM ram)
-			else (CPUState Fetch regs, RAM ram)
-		Nop -> (CPUState stage regs, RAM ram)
-	ReadMem (Ptr ptr) -> (
-			CPUState Fetch regs { regACC = ram !! (fromIntegral ptr) },
-			RAM ram
-		)
-	WriteMem (Ptr ptr) -> (
-			CPUState Fetch regs,
-			RAM (setAt (fromIntegral ptr) (readRegACC regs) ram)
-		)
-
--- Source: https://stackoverflow.com/a/5852820/7834359
-setAt :: Int -> a -> [a] -> [a]
-setAt _ _ [] = []
-setAt n newVal (x:xs)
-	| n == 0 = newVal:xs
-	| otherwise = x:setAt (n-1) newVal xs
