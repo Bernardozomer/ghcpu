@@ -1,5 +1,6 @@
 import Data.Word
 
+-- Execute a stage in the instruction cycle.
 exeStage :: (CPUState, RAM) ->  (CPUState, RAM)
 exeStage (CPUState stage regs, RAM ram) = case stage of
 	Decode -> (CPUState (Execute (decodeInstr (readRegIR regs))) regs, RAM ram)
