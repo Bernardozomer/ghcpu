@@ -6,7 +6,7 @@ exeStage (CPUState stage regs, RAM ram) = case stage of
 	Decode -> (CPUState (Execute (decodeInstr (readRegIR regs))) regs, RAM ram)
 	Execute instr -> case instr of
 		Lod ptr -> (
-				CPUState Fetch (writeRegACC (readMem ptr (RAM ram)) regs),
+				CPUState Fetch (writeToRegACC (readMem ptr (RAM ram)) regs),
 				RAM ram
 			)
 		Sto ptr -> (
@@ -18,16 +18,16 @@ exeStage (CPUState stage regs, RAM ram) = case stage of
 			then (CPUState Fetch regs { regIC = ptr }, RAM ram)
 			else (CPUState Fetch regs, RAM ram)
 		Cpe ptr -> if readMem ptr (RAM ram) == readRegACC regs
-			then (CPUState Fetch (writeRegACC 0 regs), RAM ram)
-			else (CPUState Fetch (writeRegACC 1 regs), RAM ram)
+			then (CPUState Fetch (writeToRegACC 0 regs), RAM ram)
+			else (CPUState Fetch (writeToRegACC 1 regs), RAM ram)
 		Add ptr -> (
-				CPUState Fetch (writeRegACC (
+				CPUState Fetch (writeToRegACC (
 						readRegACC regs + readMem ptr (RAM ram)) regs
 					),
 				RAM ram
 			)
 		Sub ptr -> (
-				CPUState Fetch (writeRegACC (
+				CPUState Fetch (writeToRegACC (
 						readRegACC regs - readMem ptr (RAM ram)) regs
 					),
 				RAM ram
@@ -61,8 +61,8 @@ readRegEQZ (Regs _ regEQZ _ _ _ _) = regEQZ
 readRegIR :: Regs -> (Val, Ptr)
 readRegIR (Regs _ _ _ regIR _ _) = regIR
 
-writeRegACC :: Val -> Regs -> Regs
-writeRegACC val regs = if val == 0
+writeToRegACC :: Val -> Regs -> Regs
+writeToRegACC val regs = if val == 0
 	then regs { regACC = val, regEQZ = True }
 	else regs { regACC = val, regEQZ = False }
 
