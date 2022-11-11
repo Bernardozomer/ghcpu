@@ -1,4 +1,3 @@
-import Data.Bool
 import Data.Word
 
 main = do
@@ -45,19 +44,20 @@ decodeInstr (Val val, y)
 
 exeInstr :: (CPUState, Mem) -> (CPUState, Mem)
 exeInstr (CPUState (Execute instr) regs, mem) = case instr of
-	Lod ptr -> (CPUState Fetch (writeToRegACC (readMem ptr mem) regs), mem)
-	Sto ptr -> (CPUState Fetch regs, writeToMem ptr (regACC regs) mem)
-	Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, mem)
-	Jmz ptr -> (CPUState Fetch regs { regIC = newRegIC }, mem)
+	Lod ptr -> (fetch (writeToRegACC (readMem ptr mem) regs), mem)
+	Sto ptr -> (fetch regs, writeToMem ptr (regACC regs) mem)
+	Jmp ptr -> (fetch regs { regIC = ptr }, mem)
+	Jmz ptr -> (fetch regs { regIC = newRegIC }, mem)
 		where newRegIC = if regEQZ regs then ptr else regIC regs
-	Cpe ptr -> (CPUState Fetch (writeToRegACC newRegACC regs), mem)
+	Cpe ptr -> (fetch (writeToRegACC newRegACC regs), mem)
 		where newRegACC = if readMem ptr mem == regACC regs then 0 else 1
-	Add ptr -> (CPUState Fetch (writeToRegACC sumRes regs), mem)
+	Add ptr -> (fetch (writeToRegACC sumRes regs), mem)
 		where sumRes = regACC regs + readMem ptr mem
-	Sub ptr -> (CPUState Fetch (writeToRegACC subRes regs), mem)
+	Sub ptr -> (fetch (writeToRegACC subRes regs), mem)
 		where subRes = regACC regs - readMem ptr mem
-	Nop -> (CPUState Fetch regs, mem)
+	Nop -> (fetch regs, mem)
 	Hlt -> (Halted, mem)
+	where fetch = CPUState Fetch
 
 writeToRegACC :: Val -> Regs -> Regs
 writeToRegACC val regs = regs { regACC = val, regEQZ = (val == (Val 0)) }
