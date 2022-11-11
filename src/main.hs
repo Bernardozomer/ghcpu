@@ -44,29 +44,21 @@ decodeInstr (Val val, y)
 
 exeInstr :: (CPUState, Mem) -> (CPUState, Mem)
 exeInstr (CPUState (Execute instr) regs, mem) = case instr of
-		Lod ptr -> (CPUState Fetch (writeToRegACC (readMem ptr mem) regs), mem)
-		Sto ptr -> (CPUState Fetch regs, writeToMem ptr (regACC regs) mem)
-		Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, mem)
-		Jmz ptr -> if regEQZ regs
-			then (CPUState Fetch regs { regIC = ptr }, mem)
-			else (CPUState Fetch regs, mem)
-		Cpe ptr -> if readMem ptr mem == regACC regs
-			then (CPUState Fetch (writeToRegACC 0 regs), mem)
-			else (CPUState Fetch (writeToRegACC 1 regs), mem)
-		Add ptr -> (
-				CPUState Fetch (writeToRegACC (
-						regACC regs + readMem ptr mem) regs
-					),
-				mem
-			)
-		Sub ptr -> (
-				CPUState Fetch (writeToRegACC (
-						regACC regs - readMem ptr mem) regs
-					),
-				mem
-			)
-		Nop -> (CPUState Fetch regs, mem)
-		Hlt -> (Halted, mem)
+	Lod ptr -> (CPUState Fetch (writeToRegACC (readMem ptr mem) regs), mem)
+	Sto ptr -> (CPUState Fetch regs, writeToMem ptr (regACC regs) mem)
+	Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, mem)
+	Jmz ptr -> if regEQZ regs
+		then (CPUState Fetch regs { regIC = ptr }, mem)
+		else (CPUState Fetch regs, mem)
+	Cpe ptr -> if readMem ptr mem == regACC regs
+		then (CPUState Fetch (writeToRegACC 0 regs), mem)
+		else (CPUState Fetch (writeToRegACC 1 regs), mem)
+	Add ptr -> (CPUState Fetch (writeToRegACC sumRes regs), mem)
+		where sumRes = regACC regs + readMem ptr mem
+	Sub ptr -> (CPUState Fetch (writeToRegACC subRes regs), mem)
+		where subRes = regACC regs - readMem ptr mem
+	Nop -> (CPUState Fetch regs, mem)
+	Hlt -> (Halted, mem)
 
 writeToRegACC :: Val -> Regs -> Regs
 writeToRegACC val regs = regs { regACC = val, regEQZ = (val == (Val 0)) }
