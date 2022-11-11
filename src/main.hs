@@ -13,44 +13,15 @@ exeCycles (state, ram) = case state of
 
 -- Execute a stage in the instruction cycle.
 exeStage :: (CPUState, RAM) -> (CPUState, RAM)
-exeStage (CPUState stage regs, RAM ram) = case stage of
+exeStage (CPUState stage regs, ram) = case stage of
 	Fetch -> (
-			CPUState Decode (fetchNextInstr regs (RAM ram)) {
+			CPUState Decode (fetchNextInstr regs ram) {
 					regIC = (regIC regs) + (Ptr 2)
 				},
-			(RAM ram)
+			ram
 		)
-	Decode -> (CPUState (Execute (decodeInstr (regIR regs))) regs, RAM ram)
-	Execute instr -> case instr of
-		Lod ptr -> (
-				CPUState Fetch (writeToRegACC (readMem ptr (RAM ram)) regs),
-				RAM ram
-			)
-		Sto ptr -> (
-				CPUState Fetch regs,
-				writeToMem ptr (regACC regs) (RAM ram)
-			)
-		Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, RAM ram)
-		Jmz ptr -> if regEQZ regs
-			then (CPUState Fetch regs { regIC = ptr }, RAM ram)
-			else (CPUState Fetch regs, RAM ram)
-		Cpe ptr -> if readMem ptr (RAM ram) == regACC regs
-			then (CPUState Fetch (writeToRegACC 0 regs), RAM ram)
-			else (CPUState Fetch (writeToRegACC 1 regs), RAM ram)
-		Add ptr -> (
-				CPUState Fetch (writeToRegACC (
-						regACC regs + readMem ptr (RAM ram)) regs
-					),
-				RAM ram
-			)
-		Sub ptr -> (
-				CPUState Fetch (writeToRegACC (
-						regACC regs - readMem ptr (RAM ram)) regs
-					),
-				RAM ram
-			)
-		Nop -> (CPUState stage regs, RAM ram)
-		Hlt -> (Halted, RAM ram)
+	Decode -> (CPUState (Execute (decodeInstr (regIR regs))) regs, ram)
+	Execute instr -> exeInstr (CPUState stage regs, ram)
 
 fetchNextInstr :: Regs -> RAM -> Regs
 fetchNextInstr regs ram = regs {
@@ -72,6 +43,32 @@ decodeInstr (Val val, y)
 	| val == 16 = Sub y
 	| val == 18 = Nop
 	| val == 20 = Hlt
+
+exeInstr :: (CPUState, RAM) -> (CPUState, RAM)
+exeInstr (CPUState (Execute instr) regs, ram) = case instr of
+		Lod ptr -> (CPUState Fetch (writeToRegACC (readMem ptr ram) regs), ram)
+		Sto ptr -> (CPUState Fetch regs, writeToMem ptr (regACC regs) ram)
+		Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, ram)
+		Jmz ptr -> if regEQZ regs
+			then (CPUState Fetch regs { regIC = ptr }, ram)
+			else (CPUState Fetch regs, ram)
+		Cpe ptr -> if readMem ptr ram == regACC regs
+			then (CPUState Fetch (writeToRegACC 0 regs), ram)
+			else (CPUState Fetch (writeToRegACC 1 regs), ram)
+		Add ptr -> (
+				CPUState Fetch (writeToRegACC (
+						regACC regs + readMem ptr ram) regs
+					),
+				ram
+			)
+		Sub ptr -> (
+				CPUState Fetch (writeToRegACC (
+						regACC regs - readMem ptr ram) regs
+					),
+				ram
+			)
+		Nop -> (CPUState Fetch regs, ram)
+		Hlt -> (Halted, ram)
 
 writeToRegACC :: Val -> Regs -> Regs
 writeToRegACC val regs = if val == 0
