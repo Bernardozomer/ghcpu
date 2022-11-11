@@ -69,9 +69,7 @@ exeInstr (CPUState (Execute instr) regs, mem) = case instr of
 		Hlt -> (Halted, mem)
 
 writeToRegACC :: Val -> Regs -> Regs
-writeToRegACC val regs = if val == 0
-	then regs { regACC = val, regEQZ = True }
-	else regs { regACC = val, regEQZ = False }
+writeToRegACC val regs = regs { regACC = val, regEQZ = (val == (Val 0)) }
 
 readMem :: Ptr -> Mem -> Val
 readMem (Ptr ptr) (Mem mem) = mem !! (fromIntegral ptr)
