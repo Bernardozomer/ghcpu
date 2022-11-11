@@ -14,17 +14,13 @@ exeCycles (state, ram) = case state of
 -- Execute a stage in the instruction cycle.
 exeStage :: (CPUState, RAM) -> (CPUState, RAM)
 exeStage (CPUState stage regs, ram) = case stage of
-	Fetch -> (
-			CPUState Decode (fetchNextInstr regs ram) {
-					regIC = (regIC regs) + (Ptr 2)
-				},
-			ram
-		)
+	Fetch -> (CPUState Decode (fetchNextInstr regs ram), ram)
 	Decode -> (CPUState (Execute (decodeInstr (regIR regs))) regs, ram)
 	Execute instr -> exeInstr (CPUState stage regs, ram)
 
 fetchNextInstr :: Regs -> RAM -> Regs
 fetchNextInstr regs ram = regs {
+		regIC = (regIC regs) + (Ptr 2),
 		regIR = (
 				readMem (regIC regs) ram,
 				Ptr (valToWord8 (readMem ((regIC regs) + (Ptr 1)) ram))
