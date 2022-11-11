@@ -1,3 +1,4 @@
+import Data.Bool
 import Data.Word
 
 main = do
@@ -47,9 +48,8 @@ exeInstr (CPUState (Execute instr) regs, mem) = case instr of
 	Lod ptr -> (CPUState Fetch (writeToRegACC (readMem ptr mem) regs), mem)
 	Sto ptr -> (CPUState Fetch regs, writeToMem ptr (regACC regs) mem)
 	Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, mem)
-	Jmz ptr -> if regEQZ regs
-		then (CPUState Fetch regs { regIC = ptr }, mem)
-		else (CPUState Fetch regs, mem)
+	Jmz ptr -> (CPUState Fetch regs { regIC = newRegIC }, mem)
+		where newRegIC = if regEQZ regs then ptr else regIC regs
 	Cpe ptr -> if readMem ptr mem == regACC regs
 		then (CPUState Fetch (writeToRegACC 0 regs), mem)
 		else (CPUState Fetch (writeToRegACC 1 regs), mem)
