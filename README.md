@@ -14,7 +14,7 @@ will be displayed in decimal on the screen.
 
 ### Registers
 
-The GHCPU has a total of seven registers. They are:
+The GHCPU has a total of four registers. They are:
 
 | **Register** | **Name**                | **Size (bits)** | **Description**                                                                                                                                     |
 |-------------:|-------------------------|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -22,8 +22,6 @@ The GHCPU has a total of seven registers. They are:
 |          EQZ | Equals Zero             |        1        | Indicates when the accumulator is equal to 0                                                                                                        |
 |           IC | Instruction Counter     |        8        | Points to the next instruction to be executed. Always begins at address 0                                                                           |
 |           IR | Instruction Register    |        16       | Holds the value of the next instruction to be executed                                                                                              |
-|          MAR | Memory Address Register |        8        |                                                                                                                                                     |
-|          MDR | Memory Data Register    |        8        |                                                                                                                                                     |
 
 ### Instructions
 
