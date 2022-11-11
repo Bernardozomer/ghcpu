@@ -16,11 +16,11 @@ exeStage :: (CPUState, RAM) -> (CPUState, RAM)
 exeStage (CPUState stage regs, RAM ram) = case stage of
 	Fetch -> (
 			CPUState Decode (fetchNextInstr regs (RAM ram)) {
-					regIC = (readRegIC regs) + (Ptr 2)
+					regIC = (regIC regs) + (Ptr 2)
 				},
 			(RAM ram)
 		)
-	Decode -> (CPUState (Execute (decodeInstr (readRegIR regs))) regs, RAM ram)
+	Decode -> (CPUState (Execute (decodeInstr (regIR regs))) regs, RAM ram)
 	Execute instr -> case instr of
 		Lod ptr -> (
 				CPUState Fetch (writeToRegACC (readMem ptr (RAM ram)) regs),
@@ -28,24 +28,24 @@ exeStage (CPUState stage regs, RAM ram) = case stage of
 			)
 		Sto ptr -> (
 				CPUState Fetch regs,
-				writeToMem ptr (readRegACC regs) (RAM ram)
+				writeToMem ptr (regACC regs) (RAM ram)
 			)
 		Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, RAM ram)
-		Jmz ptr -> if readRegEQZ regs
+		Jmz ptr -> if regEQZ regs
 			then (CPUState Fetch regs { regIC = ptr }, RAM ram)
 			else (CPUState Fetch regs, RAM ram)
-		Cpe ptr -> if readMem ptr (RAM ram) == readRegACC regs
+		Cpe ptr -> if readMem ptr (RAM ram) == regACC regs
 			then (CPUState Fetch (writeToRegACC 0 regs), RAM ram)
 			else (CPUState Fetch (writeToRegACC 1 regs), RAM ram)
 		Add ptr -> (
 				CPUState Fetch (writeToRegACC (
-						readRegACC regs + readMem ptr (RAM ram)) regs
+						regACC regs + readMem ptr (RAM ram)) regs
 					),
 				RAM ram
 			)
 		Sub ptr -> (
 				CPUState Fetch (writeToRegACC (
-						readRegACC regs - readMem ptr (RAM ram)) regs
+						regACC regs - readMem ptr (RAM ram)) regs
 					),
 				RAM ram
 			)
@@ -55,8 +55,8 @@ exeStage (CPUState stage regs, RAM ram) = case stage of
 fetchNextInstr :: Regs -> RAM -> Regs
 fetchNextInstr regs ram = regs {
 		regIR = (
-				readMem (readRegIC regs) ram,
-				Ptr (valToWord8 (readMem ((readRegIC regs) + (Ptr 1)) ram))
+				readMem (regIC regs) ram,
+				Ptr (valToWord8 (readMem ((regIC regs) + (Ptr 1)) ram))
 			)
 	}
 
@@ -72,18 +72,6 @@ decodeInstr (Val val, y)
 	| val == 16 = Sub y
 	| val == 18 = Nop
 	| val == 20 = Hlt
-
-readRegACC :: Regs -> Val
-readRegACC (Regs regACC _ _ _) = regACC
-
-readRegEQZ :: Regs -> Bool
-readRegEQZ (Regs _ regEQZ _ _) = regEQZ
-
-readRegIC :: Regs -> Ptr
-readRegIC (Regs _ _ regIC _) = regIC
-
-readRegIR :: Regs -> (Val, Ptr)
-readRegIR (Regs _ _ _ regIR) = regIR
 
 writeToRegACC :: Val -> Regs -> Regs
 writeToRegACC val regs = if val == 0
