@@ -2,28 +2,30 @@ import Data.Word
 
 main = do
 	contents <- readFile "test"
-	let ram = map (read::String->Word8) . words $ contents
-	print $ show ram
+	let mem = map (read::String->Word8) . words $ contents
+	print $ show mem
 
 -- Execute instruction cycles until the processor is halted.
-exeCycles :: (CPUState, RAM) -> (CPUState, RAM)
-exeCycles (state, ram) = case state of
-    Halted -> (state, ram)
-    otherwise -> exeCycles (exeStage (state, ram))
+exeCycles :: (CPUState, Mem) -> (CPUState, Mem)
+exeCycles (state, mem) = case state of
+    Halted -> (state, mem)
+    otherwise -> exeCycles (exeStage (state, mem))
 
--- Execute a stage in the instruction cycle.
-exeStage :: (CPUState, RAM) -> (CPUState, RAM)
-exeStage (CPUState stage regs, ram) = case stage of
-	Fetch -> (CPUState Decode (fetchInstr regs ram), ram)
-	Decode -> (CPUState (Execute (decodeInstr (regIR regs))) regs, ram)
-	Execute instr -> exeInstr (CPUState stage regs, ram)
+-- Execute a single stage in the instruction cycle.
+exeStage :: (CPUState, Mem) -> (CPUState, Mem)
+exeStage (CPUState stage regs, mem) = case stage of
+	Fetch -> (CPUState Decode (fetchInstr regs mem), mem)
+	Decode -> (CPUState (Execute (decodeInstr (regIR regs))) regs, mem)
+	Execute instr -> exeInstr (CPUState stage regs, mem)
 
-fetchInstr :: Regs -> RAM -> Regs
-fetchInstr regs ram = regs {
+-- Fetch the next instruction at memory locations regIC and regIC + 1
+-- and increment regIC in 2.
+fetchInstr :: Regs -> Mem -> Regs
+fetchInstr regs mem = regs {
 		regIC = (regIC regs) + (Ptr 2),
 		regIR = (
-				readMem (regIC regs) ram,
-				Ptr (valToWord8 (readMem ((regIC regs) + (Ptr 1)) ram))
+				readMem (regIC regs) mem,
+				Ptr (valToWord8 (readMem ((regIC regs) + (Ptr 1)) mem))
 			)
 	}
 
@@ -40,42 +42,42 @@ decodeInstr (Val val, y)
 	| val == 18 = Nop
 	| val == 20 = Hlt
 
-exeInstr :: (CPUState, RAM) -> (CPUState, RAM)
-exeInstr (CPUState (Execute instr) regs, ram) = case instr of
-		Lod ptr -> (CPUState Fetch (writeToRegACC (readMem ptr ram) regs), ram)
-		Sto ptr -> (CPUState Fetch regs, writeToMem ptr (regACC regs) ram)
-		Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, ram)
+exeInstr :: (CPUState, Mem) -> (CPUState, Mem)
+exeInstr (CPUState (Execute instr) regs, mem) = case instr of
+		Lod ptr -> (CPUState Fetch (writeToRegACC (readMem ptr mem) regs), mem)
+		Sto ptr -> (CPUState Fetch regs, writeToMem ptr (regACC regs) mem)
+		Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, mem)
 		Jmz ptr -> if regEQZ regs
-			then (CPUState Fetch regs { regIC = ptr }, ram)
-			else (CPUState Fetch regs, ram)
-		Cpe ptr -> if readMem ptr ram == regACC regs
-			then (CPUState Fetch (writeToRegACC 0 regs), ram)
-			else (CPUState Fetch (writeToRegACC 1 regs), ram)
+			then (CPUState Fetch regs { regIC = ptr }, mem)
+			else (CPUState Fetch regs, mem)
+		Cpe ptr -> if readMem ptr mem == regACC regs
+			then (CPUState Fetch (writeToRegACC 0 regs), mem)
+			else (CPUState Fetch (writeToRegACC 1 regs), mem)
 		Add ptr -> (
 				CPUState Fetch (writeToRegACC (
-						regACC regs + readMem ptr ram) regs
+						regACC regs + readMem ptr mem) regs
 					),
-				ram
+				mem
 			)
 		Sub ptr -> (
 				CPUState Fetch (writeToRegACC (
-						regACC regs - readMem ptr ram) regs
+						regACC regs - readMem ptr mem) regs
 					),
-				ram
+				mem
 			)
-		Nop -> (CPUState Fetch regs, ram)
-		Hlt -> (Halted, ram)
+		Nop -> (CPUState Fetch regs, mem)
+		Hlt -> (Halted, mem)
 
 writeToRegACC :: Val -> Regs -> Regs
 writeToRegACC val regs = if val == 0
 	then regs { regACC = val, regEQZ = True }
 	else regs { regACC = val, regEQZ = False }
 
-readMem :: Ptr -> RAM -> Val
-readMem (Ptr ptr) (RAM ram) = ram !! (fromIntegral ptr)
+readMem :: Ptr -> Mem -> Val
+readMem (Ptr ptr) (Mem mem) = mem !! (fromIntegral ptr)
 
-writeToMem :: Ptr -> Val -> RAM -> RAM
-writeToMem (Ptr ptr) val (RAM ram) = RAM (setAt (fromIntegral ptr) val ram)
+writeToMem :: Ptr -> Val -> Mem -> Mem
+writeToMem (Ptr ptr) val (Mem mem) = Mem (setAt (fromIntegral ptr) val mem)
 
 ptrToWord8 :: Ptr -> Word8
 ptrToWord8 (Ptr a) = a
@@ -103,7 +105,7 @@ data Regs = Regs {
 	regIR  :: (Val, Ptr)
 } deriving (Show)
 
-data RAM = RAM [Val] deriving (Show)
+data Mem = Mem [Val] deriving (Show)
 newtype Ptr = Ptr Word8 deriving (Eq, Show)
 
 instance Num Ptr where
