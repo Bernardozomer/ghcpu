@@ -5,8 +5,14 @@ main = do
 	let ram = map (read::String->Word8) . words $ contents
 	print $ show ram
 
+-- Execute instruction cycles until the processor is halted.
+exeCycles :: (CPUState, RAM) -> (CPUState, RAM)
+exeCycles (state, ram) = case state of
+    Halted -> (state, ram)
+    otherwise -> exeCycles (exeStage (state, ram))
+
 -- Execute a stage in the instruction cycle.
-exeStage :: (CPUState, RAM) ->  (CPUState, RAM)
+exeStage :: (CPUState, RAM) -> (CPUState, RAM)
 exeStage (CPUState stage regs, RAM ram) = case stage of
 	Decode -> (CPUState (Execute (decodeInstr (readRegIR regs))) regs, RAM ram)
 	Execute instr -> case instr of
