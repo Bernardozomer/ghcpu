@@ -14,6 +14,12 @@ exeCycles (state, ram) = case state of
 -- Execute a stage in the instruction cycle.
 exeStage :: (CPUState, RAM) -> (CPUState, RAM)
 exeStage (CPUState stage regs, RAM ram) = case stage of
+	Fetch -> (
+			CPUState Decode (fetchNextInstr regs (RAM ram)) {
+					regIC = (readRegIC regs) + (Ptr 2)
+				},
+			(RAM ram)
+		)
 	Decode -> (CPUState (Execute (decodeInstr (readRegIR regs))) regs, RAM ram)
 	Execute instr -> case instr of
 		Lod ptr -> (
@@ -45,6 +51,14 @@ exeStage (CPUState stage regs, RAM ram) = case stage of
 			)
 		Nop -> (CPUState stage regs, RAM ram)
 		Hlt -> (Halted, RAM ram)
+
+fetchNextInstr :: Regs -> RAM -> Regs
+fetchNextInstr regs ram = regs {
+		regIR = (
+				readMem (readRegIC regs) ram,
+				Ptr (valToWord8 (readMem ((readRegIC regs) + (Ptr 1)) ram))
+			)
+	}
 
 -- Decode a 16-bit instruction code.
 decodeInstr :: (Val, Ptr) -> Instr
@@ -82,6 +96,12 @@ readMem (Ptr ptr) (RAM ram) = ram !! (fromIntegral ptr)
 writeToMem :: Ptr -> Val -> RAM -> RAM
 writeToMem (Ptr ptr) val (RAM ram) = RAM (setAt (fromIntegral ptr) val ram)
 
+ptrToWord8 :: Ptr -> Word8
+ptrToWord8 (Ptr a) = a
+
+valToWord8 :: Val -> Word8
+valToWord8 (Val a) = a
+
 -- Source: https://stackoverflow.com/a/5852820/7834359
 setAt :: Int -> a -> [a] -> [a]
 setAt _ _ [] = []
@@ -104,6 +124,11 @@ data Regs = Regs {
 
 data RAM = RAM [Val] deriving (Show)
 newtype Ptr = Ptr Word8 deriving (Eq, Show)
+
+instance Num Ptr where
+	Ptr a + Ptr b = Ptr (a + b)
+	Ptr a - Ptr b = Ptr (a - b)
+
 newtype Val = Val Word8 deriving (Eq, Show)
 
 instance Num Val where
