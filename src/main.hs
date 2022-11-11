@@ -48,15 +48,16 @@ exeStage (CPUState stage regs, RAM ram) = case stage of
 
 -- Decode a 16-bit instruction code.
 decodeInstr :: (Val, Ptr) -> Instr
-decodeInstr  (Val 2, y) = Lod y
-decodeInstr  (Val 4, y) = Sto y
-decodeInstr  (Val 6, y) = Jmp y
-decodeInstr  (Val 8, y) = Jmz y
-decodeInstr (Val 10, y) = Cpe y
-decodeInstr (Val 14, y) = Add y
-decodeInstr (Val 16, y) = Sub y
-decodeInstr (Val 18, y) = Nop
-decodeInstr (Val 20, y) = Hlt
+decodeInstr (Val val, y)
+	| val == 2  = Lod y
+	| val == 4  = Sto y
+	| val == 6  = Jmp y
+	| val == 8  = Jmz y
+	| val == 10 = Cpe y
+	| val == 14 = Add y
+	| val == 16 = Sub y
+	| val == 18 = Nop
+	| val == 20 = Hlt
 
 readRegACC :: Regs -> Val
 readRegACC (Regs regACC _ _ _) = regACC
