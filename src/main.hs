@@ -89,24 +89,11 @@ setAt n newVal (x:xs)
 	| n == 0 = newVal:xs
 	| otherwise = x:setAt (n-1) newVal xs
 
-data Instr =
-	  Lod Ptr
-	| Sto Ptr
-	| Jmp Ptr
-	| Jmz Ptr
-	| Cpe Ptr
-	| Add Ptr
-	| Sub Ptr
-	| Nop
-	| Hlt
-	deriving (Show)
+data Instr = Lod Ptr | Sto Ptr | Jmp Ptr | Jmz Ptr
+	| Cpe Ptr | Add Ptr | Sub Ptr | Nop | Hlt deriving (Show)
 
 data CPUState = CPUState Stage Regs | Halted
-
-data Stage =
-	  Fetch
-	| Decode
-	| Execute Instr
+data Stage = Fetch | Decode | Execute Instr
 
 data Regs = Regs {
 	regACC :: Val,
@@ -118,7 +105,9 @@ data Regs = Regs {
 data RAM = RAM [Val] deriving (Show)
 
 newtype Ptr = Ptr Word8 deriving (Eq, Show)
+
 newtype Val = Val Word8 deriving (Eq, Show)
+
 instance Num Val where
 	Val a + Val b = Val (a + b)
 	Val a - Val b = Val (a - b)
