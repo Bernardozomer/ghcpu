@@ -47,20 +47,17 @@ decodeInstr (Val 16, y) = Sub y
 decodeInstr (Val 18, y) = Nop
 decodeInstr (Val 20, y) = Hlt
 
-readRegPtr :: Reg -> Regs -> Ptr
-readRegPtr reg (Regs _ _ regIC _ regMAR regMDR) = case reg of
-	RegIC  -> regIC
-	RegMAR -> regMAR
-	RegMDR -> regMDR
-
 readRegACC :: Regs -> Val
-readRegACC (Regs regACC _ _ _ _ _) = regACC
+readRegACC (Regs regACC _ _ _) = regACC
 
 readRegEQZ :: Regs -> Bool
-readRegEQZ (Regs _ regEQZ _ _ _ _) = regEQZ
+readRegEQZ (Regs _ regEQZ _ _) = regEQZ
+
+readRegIC :: Regs -> Ptr
+readRegIC (Regs _ _ regIC _) = regIC
 
 readRegIR :: Regs -> (Val, Ptr)
-readRegIR (Regs _ _ _ regIR _ _) = regIR
+readRegIR (Regs _ _ _ regIR) = regIR
 
 writeToRegACC :: Val -> Regs -> Regs
 writeToRegACC val regs = if val == 0
@@ -103,12 +100,10 @@ data Regs = Regs {
 	regACC :: Val,
 	regEQZ :: Bool,
 	regIC  :: Ptr,
-	regIR  :: (Val, Ptr),
-	regMAR :: Ptr,
-	regMDR :: Ptr
+	regIR  :: (Val, Ptr)
 } deriving (Show)
 
-data Reg = RegACC | RegEQZ | RegIC | RegIR | RegMAR | RegMDR deriving (Show)
+data Reg = RegACC | RegEQZ | RegIC | RegIR deriving (Show)
 data RAM = RAM [Val] deriving (Show)
 
 newtype Ptr = Ptr Word8 deriving (Eq, Show)
