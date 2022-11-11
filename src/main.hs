@@ -50,9 +50,8 @@ exeInstr (CPUState (Execute instr) regs, mem) = case instr of
 	Jmp ptr -> (CPUState Fetch regs { regIC = ptr }, mem)
 	Jmz ptr -> (CPUState Fetch regs { regIC = newRegIC }, mem)
 		where newRegIC = if regEQZ regs then ptr else regIC regs
-	Cpe ptr -> if readMem ptr mem == regACC regs
-		then (CPUState Fetch (writeToRegACC 0 regs), mem)
-		else (CPUState Fetch (writeToRegACC 1 regs), mem)
+	Cpe ptr -> (CPUState Fetch (writeToRegACC newRegACC regs), mem)
+		where newRegACC = if readMem ptr mem == regACC regs then 0 else 1
 	Add ptr -> (CPUState Fetch (writeToRegACC sumRes regs), mem)
 		where sumRes = regACC regs + readMem ptr mem
 	Sub ptr -> (CPUState Fetch (writeToRegACC subRes regs), mem)
