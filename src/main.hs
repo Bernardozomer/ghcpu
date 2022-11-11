@@ -1,6 +1,6 @@
 import Data.Word
 
-main = do  
+main = do
 	contents <- readFile "test"
 	let ram = map (read::String->Word8) . words $ contents
 	print $ show ram
@@ -108,7 +108,6 @@ data Regs = Regs {
 	regIR  :: (Val, Ptr)
 } deriving (Show)
 
-data Reg = RegACC | RegEQZ | RegIC | RegIR deriving (Show)
 data RAM = RAM [Val] deriving (Show)
 
 newtype Ptr = Ptr Word8 deriving (Eq, Show)
