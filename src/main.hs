@@ -103,9 +103,7 @@ data Regs = Regs {
 } deriving (Show)
 
 data RAM = RAM [Val] deriving (Show)
-
 newtype Ptr = Ptr Word8 deriving (Eq, Show)
-
 newtype Val = Val Word8 deriving (Eq, Show)
 
 instance Num Val where
