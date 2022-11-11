@@ -1,5 +1,10 @@
 import Data.Word
 
+main = do  
+	contents <- readFile "test"
+	let ram = map (read::String->Word8) . words $ contents
+	print $ show ram
+
 -- Execute a stage in the instruction cycle.
 exeStage :: (CPUState, RAM) ->  (CPUState, RAM)
 exeStage (CPUState stage regs, RAM ram) = case stage of
