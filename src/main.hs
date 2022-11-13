@@ -3,7 +3,12 @@ import Data.Word
 main = do
     contents <- readFile "test"
     let mem = Mem (map readVal . words $ contents)
-    print mem
+    let memFinal = snd (exeCycles (
+            CPUState Fetch Regs {
+            regACC = Val 0,
+            regEQZ = True
+        }, mem))
+    print memFinal
 
 -- Execute instruction cycles until the processor is halted.
 exeCycles :: (CPUState, Mem) -> (CPUState, Mem)
