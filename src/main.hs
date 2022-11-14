@@ -57,7 +57,7 @@ exeInstr (CPUState (Execute instr) regs, mem) = case instr of
     Jmz ptr -> (fetch regs { regIC = newRegIC }, mem)
         where newRegIC = if regEQZ regs then ptr else regIC regs
     Cpe ptr -> (fetch (writeToRegACC newRegACC regs), mem)
-        where newRegACC = if readMem ptr mem == regACC regs then Val 1 else Val 0
+        where newRegACC = if readMem ptr mem == regACC regs then Val 0 else Val 1
     Add ptr -> (fetch (writeToRegACC sumRes regs), mem)
         where sumRes = regACC regs + readMem ptr mem
     Sub ptr -> (fetch (writeToRegACC subRes regs), mem)
