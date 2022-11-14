@@ -60,7 +60,7 @@ where A = 100, B = 75
 Expected answer is 173
 #### Assembly Code
 
-```assembly
+```python
     0   LOD     240     # Load the value in A into ACC
 
     2   ADD     241     # Add the value in B to ACC
@@ -82,7 +82,7 @@ where A = 7, B = 5
 Expected answer is 35
 #### Assembly Code
 
-```assembly
+```python
 MULT:   0   LOD     251     # Load the value in Ans into ACC
         2   ADD     240     # Add the value in A (Multiplier) to ACC 
         4   STO     251     # Store ACC into Ans
@@ -113,7 +113,7 @@ END:    18  HLT
 Expected answer is 21
 #### Assembly Code
 
-```assembly
+```python
         0   LOD     245     # Load 0 into ACC
         2   STO     240     # Store ACC into A
 
