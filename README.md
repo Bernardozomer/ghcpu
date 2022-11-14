@@ -40,3 +40,4 @@ The GHCPU has a total of nine instructions. They are:
 | 16             | `00010000`      | `SUB <ad>`    | Loads ACC with the subtraction of its contents with the contents in `<ad>`       |
 | 18             | `00010010`      | `NOP`         | Does not execute any operation                                                   |
 | 20             | `00010100`      | `HLT`         | Halts the execution cycle                                                        |
+

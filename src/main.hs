@@ -1,16 +1,19 @@
 import Data.Word
 
 main = do
-    contents <- readFile "P2"
+    putStrLn "Which program would you like to test? (1-3)"
+    test <- getLine
+    contents <- readFile ("../tests/Test" ++ test ++ ".txt")
     let mem = Mem (map readVal . words $ contents)
     let memFinal = snd (exeCycles (
             CPUState Fetch Regs {
-				regACC =  Val 0,
-				regEQZ =  True,
-				regIC  =  Ptr 0,
-				regIR  = (Val 0, Ptr 0)
+                regACC =  Val 0,
+                regEQZ =  True,
+                regIC  =  Ptr 0,
+                regIR  = (Val 0, Ptr 0)
         }, mem))
-    print memFinal
+    let resp = memIndexToWord8 memFinal 251
+    putStrLn $ "Result: " ++ show resp
 
 -- Execute instruction cycles until the processor is halted.
 exeCycles :: (CPUState, Mem) -> (CPUState, Mem)
@@ -80,6 +83,9 @@ ptrToWord8 (Ptr a) = a
 
 valToWord8 :: Val -> Word8
 valToWord8 (Val a) = a
+
+memIndexToWord8 :: Mem -> Int -> Word8
+memIndexToWord8 (Mem mem) index = valToWord8 (mem !! index)
 
 -- Casts a String to a Val
 readVal :: String -> Val
