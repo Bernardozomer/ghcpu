@@ -5,8 +5,10 @@ main = do
     let mem = Mem (map readVal . words $ contents)
     let memFinal = snd (exeCycles (
             CPUState Fetch Regs {
-            regACC = Val 0,
-            regEQZ = True
+				regACC =  Val 0,
+				regEQZ =  True,
+				regIC  =  Ptr 0,
+				regIR  = (Val 0, Ptr 0)
         }, mem))
     print memFinal
 
